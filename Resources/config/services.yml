@@ -1,0 +1,6 @@
+services:
+    rch.param_fetcher:
+        class: RCH\ParamFetcherBundle\Request\ParamFetcher
+        arguments:
+            requestStack: @request_stack
+            validator: @validator

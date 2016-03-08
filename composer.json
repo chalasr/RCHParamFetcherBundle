@@ -1,0 +1,32 @@
+{
+    "name": "chalasr/param-fetcher-bundle",
+    "description": "Fetches parameters from the body of your requests after validation.",
+    "keywords": ["request", "validation", "param", "value", "fetcher"],
+    "type": "symfony-bundle",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Robin CHALAS",
+            "email": "robin.chalas@gmail.com",
+            "homepage": "https://github.com/chalasr/RCHParamFetcherBundle"
+        }
+    ],
+    "require": {
+        "php": ">= 5.3.9",
+        "symfony/framework-bundle": "~2.4 | ~3.0",
+        "symfony/http-foundation": "~2.4 | ~3.0",
+        "symfony/http-kernel": "~2.4 | ~3.0",
+        "symfony/validator": "~2.4 | ~3.0"
+    },
+    "require-dev": {
+        "fabpot/php-cs-fixer": "^1.11"
+    },
+    "autoload": {
+        "psr-4": { "RCH\\ParamFetcherBundle\\": "" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
