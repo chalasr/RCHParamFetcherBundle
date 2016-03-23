@@ -10,15 +10,15 @@
  */
 namespace RCH\ParamFetcherBundle\Service;
 
+use RCH\ParamFetcherBundle\Controller\Annotations\AbstractParam;
+use RCH\ParamFetcherBundle\Request\ParameterBag;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use RCH\ParamFetcherBundle\Request\Param;
 
 /**
  * Fetches params from the body of the current request.
@@ -29,31 +29,37 @@ class ParamFetcher
 {
     protected $requestStack;
     protected $validator;
-    protected $methodRequirements;
+    protected $params;
+    protected $parameterBag;
 
     /**
      * Constructor.
      *
      * @param RequestStack       $request
      * @param ValidatorInterface $validator
-     * @param array              $methodRequirements
+     * @param array              $$params
      */
-    public function __construct(RequestStack $requestStack, ValidatorInterface $validator)
+    public function __construct(RequestStack $requestStack, ValidatorInterface $validator, ParamReader $paramReader)
     {
         $this->requestStack = $requestStack;
         $this->validator = $validator;
+        $this->parameterBag = new ParameterBag($paramReader);
     }
 
     /**
-     * Set requirements for the whole request.
-     *
-     * @param array $methodRequirements A list of request params with their validation rules
+     * {@inheritdoc}
      */
-    public function require(array $methodRequirements)
+    public function setController($controller)
     {
-        $this->methodRequirements = $methodRequirements;
+        $this->parameterBag->setController($this->getRequest(), $controller);
+    }
 
-        return $this;
+    /**
+     * @return ParamInterface[]
+     */
+    public function getParams()
+    {
+        return $this->parameterBag->getParams($this->getRequest());
     }
 
     /**
@@ -63,9 +69,10 @@ class ParamFetcher
      */
     public function all()
     {
+        $bag = $this->getParams();
         $params = array();
 
-        foreach ($this->methodRequirements as $key => $config) {
+        foreach ($bag as $key => $config) {
             $params[$key] = $this->get($key);
         }
 
@@ -82,12 +89,14 @@ class ParamFetcher
     public function get($name)
     {
         $request = $this->getRequest();
+        $params = $this->getParams();
 
-        if (!$paramConfig = $this->methodRequirements[$name])) {
-            return;
+        if (!array_key_exists($name, $params)) {
+            throw new \InvalidArgumentException(sprintf("No @ParamInterface configuration for parameter '%s'.", $name));
         }
 
-        $config = new Param($name, $paramConfig);
+        /* @var AbstractParam $param */
+        $config = $params[$name];
 
         if (true === $config->required && !$request->request->has($name)) {
             throw new BadRequestHttpException(
@@ -123,7 +132,7 @@ class ParamFetcher
      *
      * @return Param
      */
-    private function handleRequirements(Param $config, $param)
+    private function handleRequirements(AbstractParam $config, $param)
     {
         $name = $config->name;
 
@@ -158,6 +167,8 @@ class ParamFetcher
                 $errors = $this->validator->validate($param, $constraint);
             }
 
+            // Use ValidatorException.
+
             if (0 !== count($errors)) {
                 $error = $errors[0];
                 throw new BadRequestHttpException(
@@ -167,9 +178,6 @@ class ParamFetcher
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private function formatError($key, $invalidValue, $errorMessage)
     {
         return sprintf(

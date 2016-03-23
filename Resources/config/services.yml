@@ -1,6 +1,30 @@
+#
+# This file is part of the RCHParamFetcherBundle package.
+#
+# Robin Chalas <robin.chalas@gmail.com>
+#
+# For more informations about license, please see the LICENSE
+# file distributed in this source code.
+#
+
 services:
-    rch.param_fetcher:
-        class: RCH\ParamFetcherBundle\Request\ParamFetcher
+    # ParamFetcher Reader
+    rch.param_fetcher.reader:
+        class: RCH\ParamFetcherBundle\Service\ParamReader
+        arguments: [ "@annotation_reader" ]
+        public: false
+
+    # ParamFetcher Fetcher
+    rch.param_fetcher.fetcher:
+        class: RCH\ParamFetcherBundle\Service\ParamFetcher
         arguments:
-            requestStack: @request_stack
-            validator: @validator
+            requestStack: "@request_stack"
+            validator: "@validator"
+            paramReader: "@rch.param_fetcher.reader"
+
+    # ParamFetcher Listener
+    rch.param_fetcher.listener:
+        class: RCH\ParamFetcherBundle\EventListener\ParamListener
+        arguments: [ "@rch.param_fetcher.fetcher" ]
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }

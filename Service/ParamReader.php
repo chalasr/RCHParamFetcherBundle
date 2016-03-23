@@ -1,17 +1,18 @@
 <?php
 
-/**
+/*
  * This file is part of the RCHParamFetcherBundle.
  *
- * Robin Chalas <robin.chalas@gmail.com>
+ * (c) Robin Chalas <https://github.com/chalasr>
  *
- * For more informations about license, please see the LICENSE
- * file distributed in this source code.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
 namespace RCH\ParamFetcherBundle\Service;
 
 use Doctrine\Common\Annotations\Reader;
-use FOS\RestBundle\Controller\Annotations\Param;
+use RCH\ParamFetcherBundle\Controller\Annotations\AbstractParam as Param;
 
 /**
  * Retrieves @RequestParam annotations from action.
@@ -46,21 +47,11 @@ class ParamReader
             throw new \InvalidArgumentException(sprintf("Class '%s' has no method '%s' method.", $controller->getName(), $action));
         }
 
-        return $this->getParamsFromMethod($controller->getMethod($action));
-    }
+        /* @var \ReflectionMethod */
+        $reflectionAction = $controller->getMethod($action);
+        $annotations = $this->reader->getMethodAnnotations($reflectionAction);
 
-    /**
-     * Read annotations for a given method.
-     *
-     * @param \ReflectionMethod $action Reflection method
-     *
-     * @return array Param instances of $action
-     */
-    public function getParamsFromMethod(\ReflectionMethod $action)
-    {
-        $annotations = $this->reader->getMethodAnnotations($action);
-
-        return $this->getParamsFromArray($annotations);
+        return $this->getParamsFromAnnotations($annotations);
     }
 
     /**
@@ -70,7 +61,7 @@ class ParamReader
      *
      * @return array Param instances fetched from annotations
      */
-    protected function getParamsFromArray(array $annotations)
+    protected function getParamsFromAnnotations(array $annotations)
     {
         $params = array();
 

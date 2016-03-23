@@ -2,6 +2,7 @@
 
 namespace RCH\ParamFetcherBundle;
 
+use RCH\ParamFetcherBundle\DependencyInjection\RCHParamFetcherExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**

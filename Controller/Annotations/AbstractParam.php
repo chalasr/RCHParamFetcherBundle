@@ -8,20 +8,20 @@
  * For more informations about license, please see the LICENSE
  * file distributed in this source code.
  */
-namespace RCH\ParamFetcherBundle\Request;
+namespace RCH\ParamFetcherBundle\Controller\Annotations;
 
 /**
  * Request parameter.
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-class Param
+abstract class AbstractParam implements ParamInterface
 {
-    /** @var string */
-    public $name;
-
     /** @var array */
     protected $options;
+
+    /** @var string */
+    public $name;
 
     /** @var array */
     public $requirements = array();
@@ -41,19 +41,17 @@ class Param
     /**
      * Constructor.
      *
-     * @param array $param
      * @param array $options
      */
-    public function __construct($name, array $options)
+    public function __construct(array $options)
     {
-        $this->name = $name;
         $this->options = $options;
 
-        $this->create();
-    }
+        if (!$this->options) {
+            return;
+        }
 
-    private function create()
-    {
+        $this->setName();
         $this->setRequirements();
         $this->setClass();
 
@@ -70,7 +68,7 @@ class Param
     }
 
     /**
-     * Set requirements.
+     * {@inheritdoc}
      */
     public function setRequirements()
     {
@@ -94,7 +92,7 @@ class Param
     }
 
     /**
-     * Set class for class constraint.
+     * {@inheritdoc}
      */
     public function setClass()
     {
@@ -103,7 +101,6 @@ class Param
         }
 
         $class = $this->options['class'];
-
         unset($this->options['class']);
 
         if (is_object($class)) {
@@ -115,6 +112,21 @@ class Param
         if (class_exists($class)) {
             $this->class = new $class();
         }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setName($name = null)
+    {
+        if (!$name && isset($this->options['name'])) {
+            $name = $this->options['name'];
+            unset($this->options['name']);
+        }
+
+        $this->name = $name;
 
         return $this;
     }

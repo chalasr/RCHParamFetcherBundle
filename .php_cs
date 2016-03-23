@@ -1,17 +1,17 @@
 <?php
 
-$finder = Symfony\CS\Finder\DefaultFinder::create()
+$finder = PhpCsFixer\Finder::create()
     ->in(array(__DIR__))
 ;
 
-return Symfony\CS\Config\Config::create()
-    ->level(Symfony\CS\FixerInterface::SYMFONY_LEVEL)
-    ->fixers(array(
-        '-unalign_double_arrow',
-        '-unalign_equals',
-        'align_double_arrow',
-        'newline_after_open_tag',
-        'ordered_use',
+return PhpCsFixer\Config::create()
+    ->setRules(array(
+        '@Symfony' => true,
+        'unalign_double_arrow' => false,
+        'unalign_equals' => false,
+        'align_double_arrow' => true,
+	'blank_line_after_opening_tag' => true,
+        'ordered_imports' => true,
     ))
     ->setUsingCache(false)
     ->finder($finder)
