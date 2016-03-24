@@ -1,5 +1,5 @@
 {
-    "name": "chalasr/param-fetcher-bundle",
+    "name": "rch/param-fetcher-bundle",
     "description": "Fetches parameters from the body of your requests after validation.",
     "keywords": ["request", "validation", "param", "value", "fetcher"],
     "type": "symfony-bundle",
