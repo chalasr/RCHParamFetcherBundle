@@ -11,7 +11,7 @@
 
 namespace RCH\ParamFetcherBundle\EventListener;
 
-use RCH\ParamFetcherBundle\Service\ParamFetcher;
+use RCH\ParamFetcherBundle\Request\ParamFetcher;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class ParamListener
 {
-    /** @var \RCH\ParamFetcherBundle\Service\ParamFetcher */
+    /** @var ParamFetcher */
     private $paramFetcher;
 
     /**
@@ -49,8 +49,7 @@ class ParamListener
         }
 
         $this->paramFetcher->setController($controller);
-        $attributeName = $this->getAttributeName($controller);
-        $request->attributes->set($attributeName, $this->paramFetcher);
+        $request->attributes->set($this->getArgument($controller), $this->paramFetcher);
     }
 
     /**
@@ -60,7 +59,7 @@ class ParamListener
      *
      * @return string
      */
-    private function getAttributeName(callable $controller)
+    private function getArgument(callable $controller)
     {
         list($object, $name) = $controller;
         $method = new \ReflectionMethod($object, $name);
@@ -86,6 +85,6 @@ class ParamListener
     {
         return $actionParam
             ->getClass()
-            ->isSubclassOf('\RCH\ParamFetcherBundle\Service\ParamFetcher');
+            ->isSubclassOf('\RCH\ParamFetcherBundle\Request\ParamFetcher');
     }
 }

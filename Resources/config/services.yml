@@ -10,13 +10,13 @@
 services:
     # ParamFetcher Reader
     rch.param_fetcher.reader:
-        class: RCH\ParamFetcherBundle\Service\ParamReader
+        class: RCH\ParamFetcherBundle\Request\ParamReader
         arguments: [ "@annotation_reader" ]
         public: false
 
     # ParamFetcher Fetcher
     rch.param_fetcher.fetcher:
-        class: RCH\ParamFetcherBundle\Service\ParamFetcher
+        class: RCH\ParamFetcherBundle\Request\ParamFetcher
         arguments:
             requestStack: "@request_stack"
             validator: "@validator"
@@ -28,3 +28,8 @@ services:
         arguments: [ "@rch.param_fetcher.fetcher" ]
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+
+    rch.param_fetcher.exception_format_listener:
+        class: RCH\ParamFetcherBundle\EventListener\ExceptionFormatListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }

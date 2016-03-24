@@ -11,7 +11,6 @@
 namespace RCH\ParamFetcherBundle\Request;
 
 use Doctrine\Common\Util\ClassUtils;
-use RCH\ParamFetcherBundle\Service\ParamReader;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

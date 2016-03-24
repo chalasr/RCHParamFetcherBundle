@@ -18,4 +18,8 @@ namespace RCH\ParamFetcherBundle\Controller\Annotations;
  */
 class RequestParam extends AbstractParam
 {
+    public function __toString()
+    {
+        return $this->name;
+    }
 }

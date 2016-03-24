@@ -8,17 +8,17 @@
  * For more informations about license, please see the LICENSE
  * file distributed in this source code.
  */
-namespace RCH\ParamFetcherBundle\Service;
+namespace RCH\ParamFetcherBundle\Request;
 
 use RCH\ParamFetcherBundle\Controller\Annotations\AbstractParam;
-use RCH\ParamFetcherBundle\Request\ParameterBag;
+use RCH\ParamFetcherBundle\Exception\InvalidParamException;
+use RCH\ParamFetcherBundle\Exception\UnknownParamException;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\Exception\ValidatorException;
 
 /**
  * Fetches params from the body of the current request.
@@ -59,14 +59,6 @@ class ParamFetcher
     }
 
     /**
-     * @return ParamInterface[]
-     */
-    public function getParams()
-    {
-        return $this->parameterBag->getParams($this->getRequest());
-    }
-
-    /**
      * Fetches all required parameters from the current Request body.
      *
      * @return array Params values
@@ -96,24 +88,20 @@ class ParamFetcher
         $params = $this->getParams();
 
         if (!array_key_exists($name, $params)) {
-            throw new ValidatorException(sprintf("No @ParamInterface configuration for parameter '%s'.", $name));
+            throw new UnknownParamException(sprintf('There is no @ParamInterface configuration for param %s', $name));
         }
 
         /* @var AbstractParam $param */
         $config = $params[$name];
 
         if (true === $config->required && !$request->request->has($name)) {
-            throw new ValidatorException(
-                $this->formatError($name, null, 'The parameter must be set')
-            );
+            throw new InvalidParamException($name, null, 'The parameter must be set');
         }
 
         $param = $request->request->get($name);
 
         if (false === $config->nullable && !$param) {
-            throw new ValidatorException(
-                $this->formatError($name, null, 'The parameter cannot be null')
-            );
+            throw new InvalidParamException($name, null, 'The parameter cannot be null');
         }
 
         if (($config->default && $param === $config->default)
@@ -161,9 +149,7 @@ class ParamFetcher
                 if ($accessor->isWritable($object, $name)) {
                     $accessor->setValue($object, $name, $param);
                 } else {
-                    throw new ValidatorException(
-                        sprintf('The @UniqueEntity constraint must be used on an existing property. The class "%s" does not have a property "%s"', get_class($object), $name)
-                    );
+                    throw new InvalidParamException($name, null, 'The @UniqueEntity constraint must be used on an existing property');
                 }
 
                 $errors = $this->validator->validate($object, $constraint);
@@ -173,33 +159,19 @@ class ParamFetcher
 
             if (0 !== count($errors)) {
                 $error = $errors[0];
-                throw new ValidatorException(
-                    $this->formatError($name, $error->getInvalidValue(), $error->getMessage())
-                );
+                throw new InvalidParamException($name, $error->getInvalidValue(), $error->getMessage());
             }
         }
     }
 
     /**
-     * Format ValidatorException messages.
+     * Get Params from the current Request.
      *
-     * @param  string $key          The property with an invalid value
-     * @param  mixed  $invalidValue The invalid value
-     * @param  string $errorMessage The constraint error message
-     *
-     * TODO Change to a thrownValidatorError() that throws a ValidatorException
-     * (avoids duplicates).
-     *
-     * @return string
+     * @return ParamInterface[]
      */
-    private function formatError($key, $invalidValue, $errorMessage)
+    private function getParams()
     {
-        return sprintf(
-            "Request parameter %s value '%s' violated a requirement (%s)",
-            $key,
-            $invalidValue,
-            $errorMessage
-        );
+        return $this->parameterBag->getParams($this->getRequest());
     }
 
     /**

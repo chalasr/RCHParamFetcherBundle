@@ -18,21 +18,9 @@ namespace RCH\ParamFetcherBundle\Controller\Annotations;
 interface ParamInterface
 {
     /**
-     * Set requirements.
-     */
-    public function setRequirements();
-
-    /**
-     * Set class (used to deal with constraints e.g. @UniqueEntity).
+     * Get ParamInterface as string.
      *
-     * @param string|object|null $class The name or an instance of the given class
+     * @return string
      */
-    public function setClass();
-
-    /**
-     * Set name.
-     *
-     * @param string|null $name The parameter name.
-     */
-    public function setName($name = null);
+    public function __toString();
 }

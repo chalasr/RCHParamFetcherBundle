@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace RCH\ParamFetcherBundle\Service;
+namespace RCH\ParamFetcherBundle\Request;
 
 use Doctrine\Common\Annotations\Reader;
 use RCH\ParamFetcherBundle\Controller\Annotations\AbstractParam as Param;
