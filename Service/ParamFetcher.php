@@ -15,10 +15,10 @@ use RCH\ParamFetcherBundle\Request\ParameterBag;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Exception\ValidatorException;
 
 /**
  * Fetches params from the body of the current request.
@@ -27,9 +27,13 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ParamFetcher
 {
+    /** @var RequestStack */
     protected $requestStack;
+
+    /** @var ValidatorInterface */
     protected $validator;
-    protected $params;
+
+    /** @var ParameterBag */
     protected $parameterBag;
 
     /**
@@ -92,14 +96,14 @@ class ParamFetcher
         $params = $this->getParams();
 
         if (!array_key_exists($name, $params)) {
-            throw new \InvalidArgumentException(sprintf("No @ParamInterface configuration for parameter '%s'.", $name));
+            throw new ValidatorException(sprintf("No @ParamInterface configuration for parameter '%s'.", $name));
         }
 
         /* @var AbstractParam $param */
         $config = $params[$name];
 
         if (true === $config->required && !$request->request->has($name)) {
-            throw new BadRequestHttpException(
+            throw new ValidatorException(
                 $this->formatError($name, null, 'The parameter must be set')
             );
         }
@@ -107,7 +111,7 @@ class ParamFetcher
         $param = $request->request->get($name);
 
         if (false === $config->nullable && !$param) {
-            throw new BadRequestHttpException(
+            throw new ValidatorException(
                 $this->formatError($name, null, 'The parameter cannot be null')
             );
         }
@@ -128,7 +132,7 @@ class ParamFetcher
      *
      * @param Param $param
      *
-     * @throws BadRequestHttpException If the param is not valid
+     * @throws \InvalidArgumentException If the param is not valid
      *
      * @return Param
      */
@@ -157,7 +161,7 @@ class ParamFetcher
                 if ($accessor->isWritable($object, $name)) {
                     $accessor->setValue($object, $name, $param);
                 } else {
-                    throw new BadRequestHttpException(
+                    throw new ValidatorException(
                         sprintf('The @UniqueEntity constraint must be used on an existing property. The class "%s" does not have a property "%s"', get_class($object), $name)
                     );
                 }
@@ -167,17 +171,27 @@ class ParamFetcher
                 $errors = $this->validator->validate($param, $constraint);
             }
 
-            // Use ValidatorException.
-
             if (0 !== count($errors)) {
                 $error = $errors[0];
-                throw new BadRequestHttpException(
+                throw new ValidatorException(
                     $this->formatError($name, $error->getInvalidValue(), $error->getMessage())
                 );
             }
         }
     }
 
+    /**
+     * Format ValidatorException messages.
+     *
+     * @param  string $key          The property with an invalid value
+     * @param  mixed  $invalidValue The invalid value
+     * @param  string $errorMessage The constraint error message
+     *
+     * TODO Change to a thrownValidatorError() that throws a ValidatorException
+     * (avoids duplicates).
+     *
+     * @return string
+     */
     private function formatError($key, $invalidValue, $errorMessage)
     {
         return sprintf(
