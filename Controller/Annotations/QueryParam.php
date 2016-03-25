@@ -10,14 +10,16 @@
  */
 namespace RCH\ParamFetcherBundle\Controller\Annotations;
 
+use Symfony\Component\HttpFoundation\Request;
+
 /**
- * HTTP Request's request param.
+ * HTTP Request's query param.
  *
  * @Annotation
  * @Target("METHOD")
  *
  * @author Robin Chalas <rchalas@gmail.com>
  */
-class RequestParam extends AbstractParam
+class QueryParam extends AbstractParam
 {
 }

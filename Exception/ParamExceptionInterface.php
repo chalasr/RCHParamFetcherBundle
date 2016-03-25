@@ -16,7 +16,7 @@ namespace RCH\ParamFetcherBundle\Exception;
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-interface HttpRequestExceptionInterface
+interface ParamExceptionInterface
 {
     /**
      * Returns the status code.

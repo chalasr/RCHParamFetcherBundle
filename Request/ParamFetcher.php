@@ -15,7 +15,6 @@ use RCH\ParamFetcherBundle\Exception\InvalidParamException;
 use RCH\ParamFetcherBundle\Exception\UnknownParamException;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -27,27 +26,31 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ParamFetcher
 {
-    /** @var RequestStack */
-    protected $requestStack;
+    /** @var Request */
+    protected $request;
 
     /** @var ValidatorInterface */
     protected $validator;
 
-    /** @var ParameterBag */
-    protected $parameterBag;
+    /** @var ParamBag */
+    protected $paramBag;
 
     /**
      * Constructor.
      *
      * @param RequestStack       $request
      * @param ValidatorInterface $validator
-     * @param array              $$params
+     * @param ParamReader        $paramReader
      */
-    public function __construct(RequestStack $requestStack, ValidatorInterface $validator, ParamReader $paramReader)
+    public function __construct(Request $request = null, ValidatorInterface $validator, ParamReader $paramReader)
     {
-        $this->requestStack = $requestStack;
+        if (!$request) {
+            throw new \RuntimeException('There is no current request.');
+        }
+
+        $this->request = $request;
         $this->validator = $validator;
-        $this->parameterBag = new ParameterBag($paramReader);
+        $this->paramBag = new ParamBag($paramReader);
     }
 
     /**
@@ -55,7 +58,7 @@ class ParamFetcher
      */
     public function setController($controller)
     {
-        $this->parameterBag->setController($this->getRequest(), $controller);
+        $this->paramBag->setController($this->request, $controller);
     }
 
     /**
@@ -65,7 +68,7 @@ class ParamFetcher
      */
     public function all()
     {
-        $bag = $this->getParams();
+        $bag = $this->getParamsFromBag();
         $params = array();
 
         foreach ($bag as $key => $config) {
@@ -84,8 +87,8 @@ class ParamFetcher
      */
     public function get($name)
     {
-        $request = $this->getRequest();
-        $params = $this->getParams();
+        $request = $this->request;
+        $params = $this->getParamsFromBag();
 
         if (!array_key_exists($name, $params)) {
             throw new UnknownParamException(sprintf('There is no @ParamInterface configuration for param %s', $name));
@@ -169,22 +172,8 @@ class ParamFetcher
      *
      * @return ParamInterface[]
      */
-    private function getParams()
+    protected function getParamsFromBag()
     {
-        return $this->parameterBag->getParams($this->getRequest());
-    }
-
-    /**
-     * @throws \RuntimeException
-     *
-     * @return Request
-     */
-    private function getRequest()
-    {
-        if (!($request = $this->requestStack->getCurrentRequest())) {
-            throw new \RuntimeException('There is no current request.');
-        }
-
-        return $request;
+        return $this->paramBag->getParams($this->request);
     }
 }

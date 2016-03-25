@@ -11,7 +11,7 @@
 
 namespace RCH\ParamFetcherBundle\EventListener;
 
-use RCH\ParamFetcherBundle\Exception\HttpRequestException;
+use RCH\ParamFetcherBundle\Exception\ParamException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\Validator\Exception\ValidatorException;
@@ -32,7 +32,7 @@ class ExceptionFormatListener
         $request = $event->getRequest();
         $statusCode = 500;
 
-        if ($exception instanceof HttpRequestException) {
+        if ($exception instanceof ParamException) {
             $statusCode = $exception->getStatusCode();
         } elseif ($exception instanceof ValidatorException) {
             $statusCode = 400;
@@ -54,6 +54,12 @@ class ExceptionFormatListener
      */
     protected function createJsonResponseForException(\Exception $exception, $statusCode)
     {
-        return new JsonResponse($exception->getMessage(), $statusCode);
+        $message = [
+            'code'    => $statusCode,
+            'message' => $exception->getMessage(),
+            'errors'  => $exception->getPrevious() ?: null,
+        ];
+
+        return new JsonResponse($message, $statusCode);
     }
 }

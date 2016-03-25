@@ -16,7 +16,7 @@ namespace RCH\ParamFetcherBundle\Exception;
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-class InvalidParamException extends HttpRequestException
+class InvalidParamException extends ParamException
 {
     /**
      * Constructor.
@@ -28,7 +28,7 @@ class InvalidParamException extends HttpRequestException
      */
     public function __construct($key, $invalidValue, $rule = null, $statusCode = 400, \Exception $previous = null)
     {
-        $message = $this->getMessageForResponse($key, $invalidValue, $rule);
+        $message = $this->prepareMessageForResponse($key, $invalidValue, $rule);
 
         parent::__construct($message, $statusCode, $previous);
     }
@@ -42,7 +42,7 @@ class InvalidParamException extends HttpRequestException
      *
      * @return string
      */
-    private function getMessageForResponse($key, $invalidValue, $rule = null)
+    protected function prepareMessageForResponse($key, $invalidValue, $rule = null)
     {
         return sprintf(
             "Request parameter %s value '%s' violated a requirement (%s)",

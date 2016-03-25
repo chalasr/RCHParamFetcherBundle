@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-class ParameterBag
+class ParamBag
 {
     /** @var ParamReader */
     private $paramReader;
@@ -52,7 +52,7 @@ class ParameterBag
         }
 
         if ($this->requests[$requestHash]['params'] === null) {
-            return $this->initParams($requestHash);
+            return $this->readParamAnnotations($requestHash);
         }
 
         return $this->requests[$requestHash]['params'];
@@ -81,7 +81,7 @@ class ParameterBag
      *
      * @throws \InvalidArgumentException
      */
-    private function initParams($requestHash)
+    private function readParamAnnotations($requestHash)
     {
         $controller = $this->requests[$requestHash]['controller'];
 
@@ -89,9 +89,11 @@ class ParameterBag
             throw new \InvalidArgumentException('Controller needs to be a class instance');
         }
 
-        return $this->requests[$requestHash]['params'] = $this->paramReader->read(
+        $this->requests[$requestHash]['params'] = $this->paramReader->read(
             new \ReflectionClass(ClassUtils::getClass($controller[0])),
             $controller[1]
         );
+
+        return $this->requests[$requestHash]['params'];
     }
 }

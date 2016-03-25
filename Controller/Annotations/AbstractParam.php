@@ -10,6 +10,8 @@
  */
 namespace RCH\ParamFetcherBundle\Controller\Annotations;
 
+use Symfony\Component\HttpFoundation\ParameterBag;
+
 /**
  * Request parameter.
  *
@@ -34,4 +36,16 @@ abstract class AbstractParam implements ParamInterface
 
     /** @var bool */
     public $class = null;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fetch(ParameterBag $parameterBag)
+    {
+        if (!$parameterBag->has($this->name)) {
+            return false;
+        }
+
+        return $parameterBag->get($this->name);
+    }
 }

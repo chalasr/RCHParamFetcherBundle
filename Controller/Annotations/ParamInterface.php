@@ -10,6 +10,8 @@
  */
 namespace RCH\ParamFetcherBundle\Controller\Annotations;
 
+use Symfony\Component\HttpFoundation\ParameterBag;
+
 /**
  * Interface implemented by all kind of Param.
  *
@@ -18,9 +20,11 @@ namespace RCH\ParamFetcherBundle\Controller\Annotations;
 interface ParamInterface
 {
     /**
-     * Get ParamInterface as string.
+     * Fetch the Param from the current Request body.
      *
-     * @return string
+     * @param ParameterBag $parameterBag The corresponding ParameterBag of the current Request
+     *
+     * @return mixed
      */
-    public function __toString();
+    public function fetch(ParameterBag $parameterBag);
 }

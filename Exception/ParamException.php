@@ -16,7 +16,7 @@ namespace RCH\ParamFetcherBundle\Exception;
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-class HttpRequestException extends \RuntimeException implements HttpRequestExceptionInterface
+class ParamException extends \RuntimeException implements ParamExceptionInterface
 {
     /**
      * @var int

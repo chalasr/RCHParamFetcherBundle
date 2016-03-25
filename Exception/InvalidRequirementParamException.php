@@ -16,9 +16,9 @@ namespace RCH\ParamFetcherBundle\Exception;
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-class UnknownParamException extends ParamException
+class InvalidRequirementParamException extends ParamException
 {
-    public function __construct($message = 'There is no @ParamInterface configuration for this parameter', $statusCode = 400, \Exception $previous = null)
+    public function __construct($message = 'The given requirement is not valid', $statusCode = 400, \Exception $previous = null)
     {
         parent::__construct($message, $statusCode, $previous);
     }

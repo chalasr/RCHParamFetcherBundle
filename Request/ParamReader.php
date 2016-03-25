@@ -44,11 +44,13 @@ class ParamReader
     public function read(\ReflectionClass $controller, $action)
     {
         if (!$controller->hasMethod($action)) {
-            throw new \InvalidArgumentException(sprintf("Class '%s' has no method '%s' method.", $controller->getName(), $action));
+            throw new \InvalidArgumentException(sprintf("Class '%s' has no method named '%s'.", $controller->getName(), $action));
         }
 
         /* @var \ReflectionMethod */
         $reflectionAction = $controller->getMethod($action);
+
+        /* @var Annotation[] */
         $annotations = $this->reader->getMethodAnnotations($reflectionAction);
 
         return $this->getParamsFromAnnotations($annotations);
