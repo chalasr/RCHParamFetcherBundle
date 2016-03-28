@@ -18,7 +18,7 @@ services:
     rch.param_fetcher.fetcher:
         class: RCH\ParamFetcherBundle\Request\ParamFetcher
         arguments:
-            request: "@=service('request_stack').getCurrentRequest()"
+            request: "@request_stack"
             validator: "@validator"
             paramReader: "@rch.param_fetcher.reader"
 

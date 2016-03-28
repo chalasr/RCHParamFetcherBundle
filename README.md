@@ -80,6 +80,8 @@ rch_param_fetcher:
 
 - Using a `ConstraintViolationList` from validation errors.
 
+- Add a `$strict` argument to paramFetcher::get($key, $strict = true) && paramFetcher::all(key, $strict = false)
+
 License
 -------
 

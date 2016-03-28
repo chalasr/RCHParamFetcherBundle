@@ -1,13 +1,14 @@
 <?php
 
-/**
- * This file is part of the RCHParamFetcherBundle package.
+/*
+ * This file is part of the RCHParamFetcherBundle.
  *
- * Robin Chalas <robin.chalas@gmail.com>
+ * (c) Robin Chalas <robin.chalas@gmail.com>
  *
- * For more informations about license, please see the LICENSE
- * file distributed in this source code.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
 namespace RCH\ParamFetcherBundle\Controller\Annotations;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -38,14 +39,20 @@ abstract class AbstractParam implements ParamInterface
     public $class = null;
 
     /**
-     * {@inheritdoc}
+     * Fetch an instance of ParamInterface from the corresponding Request's ParameterBag.
+     *
+     * @param ParameterBag $parameterBag The corresponding Request's ParameterBag
+     * @param string       $default      The default value
+     * @param bool         $required     True if the parameter must be set.
+     *
+     * @return mixed
      */
-    public function fetch(ParameterBag $parameterBag)
+    public function fetchFromBag(ParameterBag $parameterBag)
     {
-        if (!$parameterBag->has($this->name)) {
+        if (!($parameterBag->has($this->name)) && (true === $this->required)) {
             return false;
         }
 
-        return $parameterBag->get($this->name);
+        return $parameterBag->get($this->name, $this->default);
     }
 }

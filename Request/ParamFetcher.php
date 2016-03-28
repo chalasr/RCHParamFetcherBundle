@@ -1,13 +1,14 @@
 <?php
 
-/**
+/*
  * This file is part of the RCHParamFetcherBundle.
  *
- * Robin Chalas <robin.chalas@gmail.com>
+ * (c) Robin Chalas <robin.chalas@gmail.com>
  *
- * For more informations about license, please see the LICENSE
- * file distributed in this source code.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
 namespace RCH\ParamFetcherBundle\Request;
 
 use RCH\ParamFetcherBundle\Controller\Annotations\AbstractParam;
@@ -15,6 +16,7 @@ use RCH\ParamFetcherBundle\Exception\InvalidParamException;
 use RCH\ParamFetcherBundle\Exception\UnknownParamException;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -26,8 +28,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ParamFetcher
 {
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var ValidatorInterface */
     protected $validator;
@@ -42,13 +44,9 @@ class ParamFetcher
      * @param ValidatorInterface $validator
      * @param ParamReader        $paramReader
      */
-    public function __construct(Request $request = null, ValidatorInterface $validator, ParamReader $paramReader)
+    public function __construct(RequestStack $requestStack, ValidatorInterface $validator, ParamReader $paramReader)
     {
-        if (!$request) {
-            throw new \RuntimeException('There is no current request.');
-        }
-
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->validator = $validator;
         $this->paramBag = new ParamBag($paramReader);
     }
@@ -58,7 +56,7 @@ class ParamFetcher
      */
     public function setController($controller)
     {
-        $this->paramBag->setController($this->request, $controller);
+        $this->paramBag->setController($this->getRequest(), $controller);
     }
 
     /**
@@ -87,7 +85,7 @@ class ParamFetcher
      */
     public function get($name)
     {
-        $request = $this->request;
+        $request = $this->getRequest();
         $params = $this->getParamsFromBag();
 
         if (!array_key_exists($name, $params)) {
@@ -95,27 +93,26 @@ class ParamFetcher
         }
 
         /* @var AbstractParam $param */
-        $config = $params[$name];
+        $param = $params[$name];
+        $paramValue = $param->fetch($this->getRequest());
 
-        if (true === $config->required && !$request->request->has($name)) {
+        if (true === $param->required && false === $paramValue) {
             throw new InvalidParamException($name, null, 'The parameter must be set');
         }
 
-        $param = $request->request->get($name);
-
-        if (false === $config->nullable && !$param) {
+        if (false === $param->nullable && (null === $paramValue || empty($paramValue))) {
             throw new InvalidParamException($name, null, 'The parameter cannot be null');
         }
 
-        if (($config->default && $param === $config->default)
-        || ($param === null && true === $config->nullable)
-        || (null === $config->requirements)) {
-            return $param;
+        if (($param->default && $paramValue === $param->default)
+        || ($paramValue === null && true === $param->nullable)
+        || (null === $param->requirements)) {
+            return $paramValue;
         }
 
-        $this->handleRequirements($config, $param);
+        $this->handleRequirements($param, $paramValue);
 
-        return $param;
+        return $paramValue;
     }
 
     /**
@@ -127,7 +124,7 @@ class ParamFetcher
      *
      * @return Param
      */
-    private function handleRequirements(AbstractParam $config, $param)
+    private function handleRequirements(AbstractParam $config, $value)
     {
         $name = $config->name;
 
@@ -150,14 +147,14 @@ class ParamFetcher
                 $accessor = PropertyAccess::createPropertyAccessor();
 
                 if ($accessor->isWritable($object, $name)) {
-                    $accessor->setValue($object, $name, $param);
+                    $accessor->setValue($object, $name, $value);
                 } else {
                     throw new InvalidParamException($name, null, 'The @UniqueEntity constraint must be used on an existing property');
                 }
 
                 $errors = $this->validator->validate($object, $constraint);
             } else {
-                $errors = $this->validator->validate($param, $constraint);
+                $errors = $this->validator->validate($value, $constraint);
             }
 
             if (0 !== count($errors)) {
@@ -174,6 +171,22 @@ class ParamFetcher
      */
     protected function getParamsFromBag()
     {
-        return $this->paramBag->getParams($this->request);
+        return $this->paramBag->getParams($this->getRequest());
+    }
+
+    /**
+     * Get the current Request.
+     *
+     * @throws \RuntimeException If there is no current request.
+     *
+     * @return Request
+     */
+    protected function getRequest()
+    {
+        if (!($request = $this->requestStack->getCurrentRequest())) {
+            throw new \RuntimeException('There is no current request.');
+        }
+
+        return $request;
     }
 }

@@ -3,7 +3,7 @@
 /*
  * This file is part of the RCHParamFetcherBundle.
  *
- * (c) Robin Chalas <https://github.com/chalasr>
+ * (c) Robin Chalas <robin.chalas@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,7 +12,7 @@
 namespace RCH\ParamFetcherBundle\Request;
 
 use Doctrine\Common\Annotations\Reader;
-use RCH\ParamFetcherBundle\Controller\Annotations\AbstractParam as Param;
+use RCH\ParamFetcherBundle\Controller\Annotations\ParamInterface;
 
 /**
  * Retrieves @RequestParam annotations from action.
@@ -21,6 +21,7 @@ use RCH\ParamFetcherBundle\Controller\Annotations\AbstractParam as Param;
  */
 class ParamReader
 {
+    /** @var Reader */
     protected $reader;
 
     /**
@@ -59,16 +60,16 @@ class ParamReader
     /**
      * Fetches parameters from a given array of annotations.
      *
-     * @param array $annotations
+     * @param Annotation[] $annotations
      *
-     * @return array Param instances fetched from annotations
+     * @return ParamInterface[] The Param instances fetched from annotations
      */
     protected function getParamsFromAnnotations(array $annotations)
     {
         $params = array();
 
         foreach ($annotations as $annotation) {
-            if ($annotation instanceof Param) {
+            if ($annotation instanceof ParamInterface) {
                 $params[$annotation->name] = $annotation;
             }
         }

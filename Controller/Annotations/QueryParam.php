@@ -1,19 +1,20 @@
 <?php
 
-/**
- * This file is part of the RCHParamFetcherBundle package.
+/*
+ * This file is part of the RCHParamFetcherBundle.
  *
- * Robin Chalas <robin.chalas@gmail.com>
+ * (c) Robin Chalas <robin.chalas@gmail.com>
  *
- * For more informations about license, please see the LICENSE
- * file distributed in this source code.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
 namespace RCH\ParamFetcherBundle\Controller\Annotations;
 
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * HTTP Request's query param.
+ * HTTP Request's GET param.
  *
  * @Annotation
  * @Target("METHOD")
@@ -22,4 +23,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class QueryParam extends AbstractParam
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function fetch(Request $request)
+    {
+        return $this->fetchFromBag($request->query);
+    }
 }

@@ -1,16 +1,17 @@
 <?php
 
-/**
- * This file is part of the RCHParamFetcherBundle package.
+/*
+ * This file is part of the RCHParamFetcherBundle.
  *
- * Robin Chalas <robin.chalas@gmail.com>
+ * (c) Robin Chalas <robin.chalas@gmail.com>
  *
- * For more informations about license, please see the LICENSE
- * file distributed in this source code.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
 namespace RCH\ParamFetcherBundle\Controller\Annotations;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Interface implemented by all kind of Param.
@@ -20,11 +21,11 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 interface ParamInterface
 {
     /**
-     * Fetch the Param from the current Request body.
+     * Fetch a given Param from the current Request.
      *
-     * @param ParameterBag $parameterBag The corresponding ParameterBag of the current Request
+     * @param Request $request The current Request
      *
      * @return mixed
      */
-    public function fetch(ParameterBag $parameterBag);
+    public function fetch(Request $request);
 }
