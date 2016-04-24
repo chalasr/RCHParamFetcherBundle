@@ -35,8 +35,6 @@ class ParamListener
     }
 
     /**
-     * Core controller handler.
-     *
      * @param FilterControllerEvent $event
      */
     public function onKernelController(FilterControllerEvent $event)
@@ -49,7 +47,7 @@ class ParamListener
         }
 
         $this->paramFetcher->setController($controller);
-        $request->attributes->set($this->getArgument($controller), $this->paramFetcher);
+        $request->attributes->set($this->getParamFetcherArgument($controller), $this->paramFetcher);
     }
 
     /**
@@ -59,7 +57,7 @@ class ParamListener
      *
      * @return string
      */
-    private function getArgument(callable $controller)
+    private function getParamFetcherArgument(callable $controller)
     {
         list($object, $name) = $controller;
         $method = new \ReflectionMethod($object, $name);
@@ -77,14 +75,14 @@ class ParamListener
      * Returns true if the given controller parameter is type-hinted as
      * an instance of ParamFetcher.
      *
-     * @param \ReflectionParameter $actionParam
+     * @param \ReflectionParameter $param
      *
      * @return bool
      */
-    private function isParamFetcher(\ReflectionParameter $actionParam)
-    {
-        return $actionParam
-            ->getClass()
-            ->isSubclassOf('\RCH\ParamFetcherBundle\Request\ParamFetcher');
-    }
+     private function isParamFetcher(\ReflectionParameter $param)
+     {
+         $paramType = $param->getClass();
+
+         return $paramType ? $paramType->isSubclassOf(ParamFetcher::class) : false;
+     }
 }

@@ -100,13 +100,14 @@ class ParamFetcher
             throw new InvalidParamException($name, null, 'The parameter must be set');
         }
 
-        if (false === $param->nullable && (null === $paramValue || empty($paramValue))) {
+        if (true === $param->required && false === $param->nullable && (null === $paramValue || empty($paramValue))) {
             throw new InvalidParamException($name, null, 'The parameter cannot be null');
         }
 
-        if (($param->default && $paramValue === $param->default)
-        || ($paramValue === null && true === $param->nullable)
-        || (null === $param->requirements)) {
+        if (
+            ($param->default && $paramValue === $param->default) ||
+            ($paramValue === null && true === $param->nullable) ||
+            (null === $param->requirements)) {
             return $paramValue;
         }
 
