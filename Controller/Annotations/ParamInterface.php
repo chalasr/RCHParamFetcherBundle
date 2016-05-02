@@ -28,4 +28,9 @@ interface ParamInterface
      * @return mixed
      */
     public function fetch(Request $request);
+
+    /**
+     * @return \Symfony\Component\Validator\Constraint[]
+     */
+    public function getRequirements();
 }

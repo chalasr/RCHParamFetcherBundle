@@ -92,7 +92,7 @@ class ParamFetcher
             throw new UnknownParamException(sprintf('There is no @ParamInterface configuration for param %s', $name));
         }
 
-        /* @var AbstractParam $param */
+        /* @var ParamInterface $param */
         $param = $params[$name];
         $paramValue = $param->fetch($this->getRequest());
 
@@ -107,7 +107,7 @@ class ParamFetcher
         if (
             ($param->default && $paramValue === $param->default) ||
             ($paramValue === null && true === $param->nullable) ||
-            (null === $param->requirements)) {
+            (null === $param->getRequirements())) {
             return $paramValue;
         }
 
@@ -129,7 +129,7 @@ class ParamFetcher
     {
         $name = $config->name;
 
-        if (null === $requirements = $config->requirements) {
+        if (null === $requirements = $config->getRequirements()) {
             return;
         }
 
