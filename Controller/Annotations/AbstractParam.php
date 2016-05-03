@@ -55,4 +55,12 @@ abstract class AbstractParam implements ParamInterface
 
         return $parameterBag->get($this->name, $this->default);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequirements()
+    {
+        return $this->requirements;
+    }
 }
