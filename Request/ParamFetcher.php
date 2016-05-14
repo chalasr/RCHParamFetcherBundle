@@ -67,7 +67,7 @@ class ParamFetcher
     public function all()
     {
         $bag = $this->getParamsFromBag();
-        $params = array();
+        $params = [];
 
         foreach ($bag as $key => $config) {
             $params[$key] = $this->get($key);
@@ -85,7 +85,6 @@ class ParamFetcher
      */
     public function get($name)
     {
-        $request = $this->getRequest();
         $params = $this->getParamsFromBag();
 
         if (!array_key_exists($name, $params)) {
@@ -104,10 +103,10 @@ class ParamFetcher
             throw new InvalidParamException($name, null, 'The parameter cannot be null');
         }
 
-        if (
-            ($param->default && $paramValue === $param->default) ||
-            ($paramValue === null && true === $param->nullable) ||
-            (null === $param->getRequirements())) {
+        if (($param->default && $paramValue === $param->default) ||
+            ($paramValue === null && true === $param->nullable)  ||
+            (null === $param->getRequirements())
+        ) {
             return $paramValue;
         }
 
@@ -135,10 +134,10 @@ class ParamFetcher
 
         foreach ($requirements as $constraint) {
             if (is_scalar($constraint)) {
-                $constraint = new Regex(array(
+                $constraint = new Regex([
                     'pattern' => '#^'.$constraint.'$#xsu',
                     'message' => sprintf('Does not match "%s"', $constraint),
-                ));
+                ]);
             } elseif (is_array($constraint)) {
                 continue;
             }
@@ -184,7 +183,7 @@ class ParamFetcher
      */
     protected function getRequest()
     {
-        if (!($request = $this->requestStack->getCurrentRequest())) {
+        if (!$request = $this->requestStack->getCurrentRequest()) {
             throw new \RuntimeException('There is no current request.');
         }
 

@@ -29,7 +29,6 @@ class ExceptionFormatListener
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
-        $request = $event->getRequest();
         $statusCode = 500;
 
         if ($exception instanceof ParamException) {
@@ -38,7 +37,7 @@ class ExceptionFormatListener
             $statusCode = 400;
         }
 
-        // Handle XML and HTML + Use twig teplates
+        // Handle XML and HTML + Use twig templates
         $response = $this->createJsonResponseForException($exception, $statusCode);
 
         $event->setResponse($response);

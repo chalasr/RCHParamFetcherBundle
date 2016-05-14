@@ -1,6 +1,6 @@
 <?php
 
-$finder = PhpCsFixer\Finder::create()
+$finder = \PhpCsFixer\Finder::create()
     ->in(array(__DIR__))
 ;
 
@@ -16,6 +16,7 @@ EOF;
 return PhpCsFixer\Config::create()
     ->setRules(array(
         '@Symfony' => true,
+        'short_array_syntax' => true,
         'unalign_double_arrow' => false,
         'unalign_equals' => false,
         'align_double_arrow' => true,

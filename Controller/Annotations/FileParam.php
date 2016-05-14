@@ -11,6 +11,8 @@
 
 namespace RCH\ParamFetcherBundle\Controller\Annotations;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Image;
 
@@ -18,6 +20,7 @@ use Symfony\Component\Validator\Constraints\Image;
  * Http Request's FILE param.
  *
  * @author Thomas Jaari <tjaari76@gmail.com>
+ * @author Robin Chalas <robin.chalas@gmail.com>
  */
 class FileParam extends AbstractParam
 {

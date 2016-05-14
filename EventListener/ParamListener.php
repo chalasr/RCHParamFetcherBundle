@@ -79,10 +79,10 @@ class ParamListener
      *
      * @return bool
      */
-     private function isParamFetcher(\ReflectionParameter $param)
-     {
-         $paramType = $param->getClass();
+    private function isParamFetcher(\ReflectionParameter $param)
+    {
+        $paramType = $param->getClass();
 
-         return $paramType ? $paramType->isSubclassOf(ParamFetcher::class) : false;
-     }
+        return $paramType ? $paramType->isSubclassOf(ParamFetcher::class) : false;
+    }
 }

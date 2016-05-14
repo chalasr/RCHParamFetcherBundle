@@ -15,7 +15,7 @@ use Doctrine\Common\Annotations\Reader;
 use RCH\ParamFetcherBundle\Controller\Annotations\ParamInterface;
 
 /**
- * Retrieves @RequestParam annotations from action.
+ * Retrieves @ParamInterface annotations from controllers.
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
@@ -66,7 +66,7 @@ class ParamReader
      */
     protected function getParamsFromAnnotations(array $annotations)
     {
-        $params = array();
+        $params = [];
 
         foreach ($annotations as $annotation) {
             if ($annotation instanceof ParamInterface) {

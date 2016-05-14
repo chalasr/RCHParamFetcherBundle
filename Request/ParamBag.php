@@ -25,7 +25,7 @@ class ParamBag
     private $paramReader;
 
     /** @var array */
-    private $requests = array();
+    private $requests = [];
 
     /**
      * Constructor.
@@ -69,10 +69,10 @@ class ParamBag
     {
         $requestHash = spl_object_hash($request);
 
-        $this->requests[$requestHash] = array(
+        $this->requests[$requestHash] = [
             'controller' => $controller,
             'params'     => null,
-        );
+        ];
     }
 
     /**

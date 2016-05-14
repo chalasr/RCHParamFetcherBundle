@@ -24,7 +24,7 @@ abstract class AbstractParam implements ParamInterface
     public $name;
 
     /** @var array */
-    public $requirements = array();
+    public $requirements = [];
 
     /** @var mixed */
     public $default = null;
