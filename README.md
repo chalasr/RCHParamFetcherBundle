@@ -1,6 +1,8 @@
 RCHParamFetcherBundle
 =====================
 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/f9e67ff7-589d-4947-9480-ecaffccbdb43/mini.png)](https://insight.sensiolabs.com/projects/f9e67ff7-589d-4947-9480-ecaffccbdb43)
+
 Automates parameters fetching and validation from the body of your requests.
 
 Inspired by the [FOSRestBundle ParamFetcher](http://symfony.com/doc/current/bundles/FOSRestBundle/param_fetcher_listener.html) in order to use it out of the bundle.
